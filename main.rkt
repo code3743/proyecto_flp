@@ -174,3 +174,19 @@
     (sllgen:make-stream-parser 
       lexica
       gramatica)))
+
+;*************************************************************************************************
+;Conversión de números
+;*************************************************************************************************
+
+(define string-upcase
+  (lambda (str)
+    (list->string (map char-upcase (string->list str)))))
+
+(define convert-to-hex
+  (lambda (num)
+    (string->symbol (string-upcase (number->string num 16)))))
+
+(define hex-to-dec
+  (lambda (hex)
+    (string->number (substring hex 2) 16)))
