@@ -245,15 +245,6 @@
     )
 )
 
-
-(define operation
-  (lambda (lst f acc)
-    (cond
-      [(null? lst) acc]
-      [else
-        (operation (cdr lst) f (f acc (car lst) ))])))
-
-
 (define apply-num-primitive
   (lambda (prim num1 num2)
     (cases primitiva prim
