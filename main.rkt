@@ -218,7 +218,9 @@
       )
       (cadena-exp (id1 id2) '())
       (decl-exp (dcl) '())
-      (lista-exp(lexps) '())
+      (lista-exp(lexps) (
+        map (lambda (exp) (eval-expression exp env)) lexps
+      ))
       (cons-exp (exp1 exp2) '())
       (empty-list-exp () '())
       (array-exp (lexp) '())
@@ -236,7 +238,14 @@
             ) 'true 'false)
         )
       )
-      (prim-list-exp (prim exp) '())
+      (prim-list-exp (prim exp) 
+        (let ([value (eval-expression exp env)])
+          (if (list? value) 
+            (apply-list-primitive prim value)
+            (eopl:error 'apply-list-primitive "Non-list argument"))
+        )
+        
+      )
       (prim-array-exp (prim lexps) '())
       (prim-cad-exp (prim lexps) '())
       (if-exp (test-exp true-exp false-exp) '())
@@ -293,4 +302,12 @@
     )
   )
 
-  (interpretador)
+(define apply-list-primitive
+  (lambda (prim args)
+    (cases primitivaListas prim
+      (first-primList () (car args))
+      (rest-primList () (cdr args))
+      (empty-primList () (if (null? args) 'true 'false))
+    )
+  )
+)
