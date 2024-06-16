@@ -185,7 +185,10 @@
 ;Ambiente inicial
 (define init-env
   (lambda ()
-    (empty-env)))
+    (extend-env
+     '(x y z)
+     '(1 2 3)
+     (empty-env))))
 
 ;Ambientes
 (define-datatype environment environment?
