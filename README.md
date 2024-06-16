@@ -2,7 +2,7 @@
 
 ### Integrantes:
 - Bernal, Pedro - 
-- López, Jota - 
+- López, Jota - 2259394-3743
 - Rivas, Esmeralda -
 
 ### Objetivo:
