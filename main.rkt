@@ -266,7 +266,7 @@
       (mayor-prim () (operation-numerical > num1 num2 #T))
       (menorigual-prim () (operation-numerical <= num1 num2 #T))
       (mayorigual-prim () (operation-numerical >= num1 num2 #T))
-      (diferente-prim () (not (operation-numerical eq? num1 num2 #T)))
+      (diferente-prim () (if (eq? 'true (operation-numerical eq? num1 num2 #T)) 'false 'true))
       (igual-prim () (operation-numerical eq? num1 num2 #T))
       )
   )

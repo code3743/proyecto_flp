@@ -75,7 +75,7 @@
           [num2 (to-decimal num2 (extract-base (to-string num2)))]
           )
       (if boolean?
-          (op num1 num2)
+          (if (op num1 num2) 'true 'false)
           (from-decimal (op num1 num2) base)
        )
     )
