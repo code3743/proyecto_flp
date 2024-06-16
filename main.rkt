@@ -218,7 +218,7 @@
           (false-exp () #F)
           )
         )
-      (var-exp (id) '())
+      (var-exp (id) (apply-env env id))
       (num-exp (num) 
         (cases numero-exp num
           (decimal-num (num) num)
