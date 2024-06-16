@@ -174,3 +174,24 @@
     (sllgen:make-stream-parser 
       lexica
       gramatica)))
+
+;eval-program: <program> ->numero
+(define eval-program
+  (lambda (pgm)
+    (cases programa pgm
+      (a-programa (str body)
+                  (eval-expression body (init-env))))))
+
+;Ambiente inicial
+(define init-env
+  (lambda ()
+    (empty-env)))
+
+;Ambientes
+(define-datatype environment environment?
+  (empty-env-record))
+
+;empty-env
+(define empty-env
+  (lambda ()
+    (empty-env-record)))
