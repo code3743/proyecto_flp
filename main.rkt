@@ -207,7 +207,15 @@
           )
         )
       (var-exp (id) '())
-      (num-exp (num) '())
+      (num-exp (num) 
+        (cases numero-exp num
+          (decimal-num (num) num)
+          (octal-num (num) (convert-string num))
+          (bin-num (num) (convert-string num))
+          (hex-num (num) (convert-string num))
+          (float-num (num) num)
+        )
+      )
       (cadena-exp (id1 id2) '())
       (decl-exp (dcl) '())
       (lista-exp(lexps) '())
@@ -233,5 +241,5 @@
       (match-exp (exp rexps lexps) '())
       )
     )
-  )
+)
   
