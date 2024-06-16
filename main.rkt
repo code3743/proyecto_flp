@@ -222,7 +222,9 @@
       (cons-exp (exp1 exp2) '())
       (empty-list-exp () '())
       (array-exp (lexp) '())
-      (prim-num-exp (exp1 prim exp2) '())
+      (prim-num-exp (exp1 prim exp2) (
+        apply-num-primitive prim (eval-expression exp1 env) (eval-expression exp2 env))
+      )
       (prim-bool-exp (prim lexps) '())
       (prim-list-exp (prim exp) '())
       (prim-array-exp (prim lexps) '())
@@ -242,4 +244,30 @@
       )
     )
 )
-  
+
+
+(define operation
+  (lambda (lst f acc)
+    (cond
+      [(null? lst) acc]
+      [else
+        (operation (cdr lst) f (f acc (car lst) ))])))
+
+
+(define apply-num-primitive
+  (lambda (prim num1 num2)
+    (cases primitiva prim
+      (sum-prim () (operation-numerical + num1 num2 #F))
+      (minus-prim () (operation-numerical - num1 num2 #F))
+      (mult-prim () (operation-numerical * num1 num2 #F))
+      (mod-prim () (operation-numerical modulo num1 num2 #F) )
+      (elevar-prim () (operation-numerical expt num1 num2 #F ))
+      (menor-prim () (operation-numerical < num1 num2 #T))
+      (mayor-prim () (operation-numerical > num1 num2 #T))
+      (menorigual-prim () (operation-numerical <= num1 num2 #T))
+      (mayorigual-prim () (operation-numerical >= num1 num2 #T))
+      (diferente-prim () (not (operation-numerical eq? num1 num2 #T)))
+      (igual-prim () (operation-numerical eq? num1 num2 #T))
+      )
+  )
+)
