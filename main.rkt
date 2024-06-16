@@ -223,7 +223,10 @@
       ))
       (cons-exp (exp1 exp2) '())
       (empty-list-exp () '())
-      (array-exp (lexp) '())
+      (array-exp (lexp)
+                 (let (
+                       (evaluated (map (lambda (exp) (eval-expression exp env)) lexp)))
+                       (list->vector evaluated)))
       (prim-num-exp (exp1 prim exp2) (
         apply-num-primitive prim (eval-expression exp1 env) (eval-expression exp2 env))
       )
@@ -246,7 +249,10 @@
         )
         
       )
-      (prim-array-exp (prim lexps) '())
+      (prim-array-exp (prim lexps)
+                      (let (
+                            (args (eval-rands lexps env)))
+                        (apply-array-primitive prim args)))
       (prim-cad-exp (prim lexps) '())
       (if-exp (test-exp true-exp false-exp) '())
       (for-exp (cond-exp from-exp until-exp by-exp do-exp) '())
@@ -311,3 +317,32 @@
     )
   )
 )
+
+(define apply-array-primitive
+  (lambda (prim args)
+    (cases primitivaArray prim
+      (length-primArr () (vector-length (car args)))
+      (index-primArr () (let (
+                              (arr (car args))
+                              (index (cadr args)))
+                           (vector-ref arr index)))
+      (slice-primArr() '())
+      (setlist-primArr () (let (
+                                (vec (car args))
+                                (pos (cadr args))
+                                (val (caddr args)))
+                            (vector-set! vec pos val)
+                             vec))
+    )
+  )
+)
+
+(define eval-rands
+  (lambda (rands env)
+    (map (lambda (x) (eval-rand x env)) rands)))
+
+(define eval-rand
+  (lambda (rand env)
+    (eval-expression rand env)))
+
+(interpretador)
