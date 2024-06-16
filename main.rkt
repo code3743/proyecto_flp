@@ -225,7 +225,17 @@
       (prim-num-exp (exp1 prim exp2) (
         apply-num-primitive prim (eval-expression exp1 env) (eval-expression exp2 env))
       )
-      (prim-bool-exp (prim lexps) '())
+      (prim-bool-exp (prim lexps)
+      
+        (if (null? lexps) (eopl:error 'apply-bool-primitive "No arguments given")
+            (if (apply-bool-primitive prim 
+              (map (lambda (exp) (let ([value (eval-expression exp env)])
+                (if (boolean? value) value
+                (eopl:error 'apply-bool-primitive "Non-boolean argument"))
+              )) lexps)
+            ) 'true 'false)
+        )
+      )
       (prim-list-exp (prim exp) '())
       (prim-array-exp (prim lexps) '())
       (prim-cad-exp (prim lexps) '())
@@ -262,3 +272,25 @@
       )
   )
 )
+
+
+(define apply-bool-primitive
+  (lambda (prim args)
+    (cases primitivaBooleana prim
+      (and-prim () (let loop ([args args])
+                    (if (null? args) #t
+                        (if (not (car args)) #f (loop (cdr args)))))
+      )
+      (or-prim () (let loop ([args args])
+          (if (null? args) #f
+              (if (car args) #t (loop (cdr args)))
+          )
+      )
+      )
+      (xor-prim () (and (or (car args) (cadr args)) (not (and (car args) (cadr args)))))
+      (not-prim () (not (car args)))
+      )
+    )
+  )
+
+  (interpretador)
