@@ -1,6 +1,6 @@
 #lang racket
 
-(provide to-decimal from-decimal convert-string operation-numerical)
+(provide to-decimal from-decimal convert-string operation-numerical array-slice)
 
 ;*************************************************************************************************
 ;Conversión de números
@@ -81,3 +81,9 @@
     )
   )
 )
+
+(define array-slice
+  (lambda (v start end)
+    (let (
+          (len (+ 1 (- end start))))
+      (build-vector len (lambda (i) (vector-ref v (+ i start)))))))

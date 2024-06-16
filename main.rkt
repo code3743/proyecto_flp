@@ -326,7 +326,11 @@
                               (arr (car args))
                               (index (cadr args)))
                            (vector-ref arr index)))
-      (slice-primArr() '())
+      (slice-primArr() (let (
+                             (vec (car args))
+                             (start (cadr args))
+                             (end (caddr args)))
+                         (array-slice vec start end)))
       (setlist-primArr () (let (
                                 (vec (car args))
                                 (pos (cadr args))
@@ -336,6 +340,8 @@
     )
   )
 )
+
+
 
 (define eval-rands
   (lambda (rands env)
