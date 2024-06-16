@@ -221,7 +221,8 @@
       (lista-exp(lexps) (
         map (lambda (exp) (eval-expression exp env)) lexps
       ))
-      (cons-exp (exp1 exp2) '())
+      (cons-exp (exp1 exp2) (
+        (cons (eval-expression exp1 env) (eval-expression exp2 env))))
       (empty-list-exp () '())
       (array-exp (lexp)
                  (let (
@@ -231,14 +232,13 @@
         apply-num-primitive prim (eval-expression exp1 env) (eval-expression exp2 env))
       )
       (prim-bool-exp (prim lexps)
-      
         (if (null? lexps) (eopl:error 'apply-bool-primitive "No arguments given")
-            (if (apply-bool-primitive prim 
+            (apply-bool-primitive prim 
               (map (lambda (exp) (let ([value (eval-expression exp env)])
                 (if (boolean? value) value
                 (eopl:error 'apply-bool-primitive "Non-boolean argument"))
               )) lexps)
-            ) 'true 'false)
+            )
         )
       )
       (prim-list-exp (prim exp) 
@@ -247,7 +247,6 @@
             (apply-list-primitive prim value)
             (eopl:error 'apply-list-primitive "Non-list argument"))
         )
-        
       )
       (prim-array-exp (prim lexps)
                       (let (
@@ -300,26 +299,23 @@
     (cases primitivaBooleana prim
       (and-prim () (let loop ([args args])
                     (if (null? args) #t
-                        (if (not (car args)) #f (loop (cdr args)))))
-      )
+                        (if (not (car args)) #f (loop (cdr args))))))
       (or-prim () (let loop ([args args])
           (if (null? args) #f
               (if (car args) #t (loop (cdr args)))
-          )
-      )
-      )
+          )))
       (xor-prim () (and (or (car args) (cadr args)) (not (and (car args) (cadr args)))))
       (not-prim () (not (car args)))
       )
     )
-  )
+)
 
 (define apply-list-primitive
   (lambda (prim args)
     (cases primitivaListas prim
       (first-primList () (car args))
       (rest-primList () (cdr args))
-      (empty-primList () (if (null? args) 'true 'false))
+      (empty-primList () (null? args))
     )
   )
 )
