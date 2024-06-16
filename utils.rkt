@@ -2,12 +2,6 @@
 
 (provide to-decimal from-decimal)
 
-
-(define string-upcase
-  (lambda (str)
-    (list->string (map char-upcase (string->list str)))))
-
-
 ;*************************************************************************************************
 ;Conversión de números
 ;*************************************************************************************************
@@ -22,8 +16,17 @@
 
 
 (define (from-decimal num base)
-  (string->symbol (cond
+  (convert-string (cond
     [(eq? base 'b) (number->string num 2)]
     [(eq? base 'o) (number->string num 8)]
     [(eq? base 'h) (string-upcase (number->string num 16))]
     )))
+
+
+(define (string-contains-letters? str)
+  (regexp-match? #rx"[A-Za-z]" str))
+
+(define (convert-string str)
+  (if (string-contains-letters? str)
+      (string->symbol str)
+      (string->number str)))
