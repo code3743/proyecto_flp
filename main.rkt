@@ -258,7 +258,13 @@
       (for-exp (cond-exp from-exp until-exp by-exp do-exp) '())
       (while-exp (cond-exp exp) '())
       (switch-exp (cond-exp case-exp lexps default-exp) '())
-      (begin-exp (exp lexps) '())
+      (begin-exp (exp exps) 
+                 (let loop (
+                            (acc (eval-expression exp env))
+                             (exps exps))
+                    (if (null? exps) acc
+                        (loop (eval-expression (car exps) env)
+                              (cdr exps)))))
       (set-exp (id exp) '())
       (func-exp (lids exp) '())
       (call-exp (exp lexps) '())
