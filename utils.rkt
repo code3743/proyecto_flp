@@ -24,7 +24,7 @@
 
 
 (define (string-contains-letters? str)
-  (regexp-match? #rx"[A-Za-z]" str))
+  (regexp-match? #rx"[A-Fa-f]" str))
 
 (define (convert-string str)
   (if (string-contains-letters? str)
