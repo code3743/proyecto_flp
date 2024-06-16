@@ -48,7 +48,7 @@
 (define prefix-base (lambda (base num)
 (if (string-contains? num "-")
   (string-append "-" (_prefix-base base) (string-replace num "-" ""))
-  (_prefix-base base)
+  (string-append (_prefix-base base) num)
 )
 )  
 )
