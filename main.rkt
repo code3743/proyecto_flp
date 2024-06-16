@@ -221,8 +221,8 @@
       (lista-exp(lexps) (
         map (lambda (exp) (eval-expression exp env)) lexps
       ))
-      (cons-exp (exp1 exp2) (
-        (cons (eval-expression exp1 env) (eval-expression exp2 env))))
+      (cons-exp (exp1 exp2) 
+        (cons (eval-expression exp1 env) (eval-expression exp2 env)))
       (empty-list-exp () '())
       (array-exp (lexp)
                  (let (
@@ -287,7 +287,7 @@
       (mayor-prim () (operation-numerical > num1 num2 #T))
       (menorigual-prim () (operation-numerical <= num1 num2 #T))
       (mayorigual-prim () (operation-numerical >= num1 num2 #T))
-      (diferente-prim () (if (eq? 'true (operation-numerical eq? num1 num2 #T)) 'false 'true))
+      (diferente-prim () (not (operation-numerical eq? num1 num2 #T)))
       (igual-prim () (operation-numerical eq? num1 num2 #T))
       )
   )
