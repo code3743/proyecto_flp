@@ -7,8 +7,9 @@
 ;; - convert-string: Converts a string to a number or symbol.
 ;; - operation-numerical: Performs a numerical operation on two numbers.
 ;; - array-slice: Extracts a slice from an array.
+;; - is-number?: Determines whether the given value is a number.
 
-(provide to-decimal from-decimal convert-string operation-numerical array-slice)
+(provide to-decimal from-decimal convert-string operation-numerical array-slice is-number?)
 
 ;; Converts a number from a given base to decimal.
 (define (to-decimal num base)
@@ -97,3 +98,11 @@
     (let (
           (len (+ 1 (- end start))))
       (build-vector len (lambda (i) (vector-ref v (+ i start)))))))
+
+;; Determines whether the given value is a number.
+(define is-number?
+  (lambda (x)
+    (cond
+      [(number? x) #t]
+      [(string? x) (not (eq? (extract-base x) 'd))]
+      [else #f])))

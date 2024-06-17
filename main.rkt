@@ -158,7 +158,9 @@
       (new-struct-exp (id lexps) '())
       (get-struct-exp (exp id) '())
       (set-struct-exp (exp1 id exp2) '())
-      (match-exp (exp rexps lexps) '())
+      (match-exp (exp rexps lexps) '(
+        
+      ))
       )
     )
 )
@@ -180,6 +182,21 @@
       )
   )
 )
+;     (expresion ("match" expresion "{" (arbno regular-exp "=>" expresion) "}") match-exp)
+;     (regular-exp (identificador "::" identificador) list-match-exp)
+;     (regular-exp ("numero" "(" identificador ")") num-match-exp)
+;     (regular-exp ("cadena" "(" identificador ")") cad-match-exp)
+;     (regular-exp ("boolean" "(" identificador ")") bool-match-exp)
+;     (regular-exp ("array" "(" (separated-list identificador ",") ")") array-match-exp)
+;     (regular-exp ("empty") empty-match-exp)
+;     (regular-exp ("default") default-match-exp)
+;     (regular-exp (identificador "::" identificador) list-match-exp)
+;     (regular-exp ("numero" "(" identificador ")") num-match-exp)
+;     (regular-exp ("cadena" "(" identificador ")") cad-match-exp)
+;     (regular-exp ("boolean" "(" identificador ")") bool-match-exp)
+;     (regular-exp ("array" "(" (separated-list identificador ",") ")") array-match-exp)
+;     (regular-exp ("empty") empty-match-exp)
+;     (regular-exp ("default") default-match-exp)
 
 
 (define apply-bool-primitive
