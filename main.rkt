@@ -201,15 +201,45 @@
                              (struct-def (apply-env env id))
                              (struct-field (if struct-def struct-def (eopl:error "Estructura no definida"))))
                         (if (= (length lexps) (length struct-field))
-                            (extend-env struct-field lexps env) (eopl:error "Numero incorrecto de argumentos"))))
+                            (list->vector (list id (map (lambda (exp) (eval-expression exp env)) lexps)))
+                            (eopl:error "Numero incorrecto de argumentos"))))
       (get-struct-exp (exp id)
                       (let* (
-                             (exp-env (eval-expression exp env))
-                             (field-value (apply-env exp-env id)))
-                        (if field-value
-                            (eval-expression field-value env) (eopl:error "Campo no encontrado"))))
+                             (struct-decl (eval-expression exp env))
+                             (struct-id-values (apply-env env (vector-ref struct-decl 0))))
+                       
+                          (let loop (
+                            [field-struct struct-id-values]
+                            [values (vector-ref struct-decl 1)])
+                        (cond
+                          [(null? field-struct) (eopl:error "Campo no encontrado") ]
+                          [(eq? (car field-struct) id) (car values)]
+                          [else (loop (cdr field-struct) (cdr values))]
+                        ))
+                        
+                      )) 
       (set-struct-exp (exp1 id exp2)
-                      '())
+                    (let* 
+                          (
+                           [struct-def (eval-expression exp1 env)]
+                           [struct-id-values (apply-env env (vector-ref struct-def 0))]
+                           [values (vector-ref struct-def 1)])
+                          (vector-set!
+                              struct-def
+                              1
+                              (let loop(
+                                  [struct-values struct-id-values]
+                                  [values values]
+                                  [acc '()]
+                                )
+                                (cond
+                                  [(null? struct-values) (eopl:error "Campo no encontrado")]
+                                  [(eq? id (car struct-values)) (append acc (list (eval-expression exp2 env)))]
+                                  [else (loop (cdr struct-values) (cdr values) (car values))]
+                                )
+                              )
+                          ))
+      )
       (match-exp (exp rexps lexps) '(
         
       ))
