@@ -187,15 +187,16 @@
                   (eval-expression rhs-exp env))
                  1))
       (func-exp (lids exp)
-                  (lambda (args)
+                  (lambda (args env)
                     (let (
-                          (new-env (extend-env lids (list args) env))) 
-                      (eval-expression exp new-env))))
+                          (new-env (extend-env lids args env))) 
+                          (eval-expression exp new-env))
+                  ))
       (call-exp (exp args)
                 (let (
                       (func-val (eval-expression exp env))
                       (eval-args (map (lambda (arg) (eval-expression arg env)) args)))
-                  (apply func-val eval-args)))
+                  (apply func-val (list eval-args env))))
       (new-struct-exp (id lexps)
                       (let* (
                              (struct-def (apply-env env id))
@@ -240,9 +241,18 @@
                               )
                           ))
       )
-      (match-exp (exp rexps lexps) '(
+      (match-exp (exp rexps lexps) 
+      (let 
+        ([match-value (eval-expression exp env)]
+         [lexps (map (lambda (exp) (eval-expression exp env)) lexps)]
+         [rexps rexps])
+         (
+          cond
+          [(null? rexps) #f]
+          [else #f])
+      )
         
-      ))
+      )
       )
     )
 )
@@ -328,7 +338,5 @@
 (define eval-rand
   (lambda (rand env)
     (eval-expression rand env)))
-
-
 
 (interpretador)
