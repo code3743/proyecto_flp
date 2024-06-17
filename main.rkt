@@ -103,7 +103,19 @@
               (if (eval-expression test-exp env)
                   (eval-expression true-exp env)
                   (eval-expression false-exp env)))
-      (for-exp (cond-exp from-exp until-exp by-exp do-exp) '())
+      (for-exp (cond-exp from-exp until-exp by-exp do-exp)
+               (let loop (
+                          (env (extend-env (list cond-exp) (list (eval-expression from-exp env)) env))
+                          (until-val (eval-expression until-exp env))
+                          (by-val (eval-expression by-exp env))
+                          (acc 0))
+                 (let ((current-val (apply-env env cond-exp)))
+                   (if (< current-val until-val) 
+                       (let* ((do-val (eval-expression do-exp env))
+                              (new-acc (+ acc do-val))
+                              (new-env (extend-env (list cond-exp) (list (+ current-val by-val)) env)))
+                         (loop new-env until-val by-val new-acc))
+                       acc))))
       (while-exp (cond-exp exp) (
         let loop (
           [cond (eval-expression cond-exp env)]
