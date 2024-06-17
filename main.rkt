@@ -55,7 +55,14 @@
           (float-num (num) num)
         )
       )
-      (cadena-exp (id1 id2) '())
+      (cadena-exp (id1 id2)
+        (letrec
+            [(crear_string(lambda(lids)
+                            (cond
+                              [(null? lids)""]
+                              [else(string-append""(symbol->string(car lids))(crear_string(cdr lids)))])))]
+          (string-append(symbol->string id1)(crear_string id2))
+          ))
       (decl-exp (dcl) (
         cases var-decl dcl
           (lvar-exp (ids rands body)
@@ -98,7 +105,11 @@
                       (let (
                             (args (eval-rands lexps env)))
                         (apply-array-primitive prim args)))
-      (prim-cad-exp (prim lexps) '())
+      (prim-cad-exp (prim lexps)
+                     (apply-cadena-primitive prim
+                                            (map (lambda (lexps)
+                                                   (eval-expression lexps env))
+                                                 lexps)))
       (if-exp (test-exp true-exp false-exp) 
               (if (eval-expression test-exp env)
                   (eval-expression true-exp env)
@@ -256,6 +267,12 @@
   )
 )
 
+(define apply-cadena-primitive
+  (lambda (prim args)
+      (cases primitivaCadena prim
+        (concat-primCad() (apply string-append args))
+        (length-primCad() (string-length (car args)))
+        (index-primCad() (string-ref (car args)(cadr args))))))
 
 (define eval-rands
   (lambda (rands env)
