@@ -2,10 +2,6 @@
 
 (provide to-decimal from-decimal convert-string operation-numerical array-slice)
 
-;*************************************************************************************************
-;Conversión de números
-;*************************************************************************************************
-
 
 (define (to-decimal num base)
   (cond
