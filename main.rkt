@@ -153,8 +153,16 @@
                   (apply-env-ref env id)
                   (eval-expression rhs-exp env))
                  1))
-      (func-exp (lids exp) '())
-      (call-exp (exp lexps) '())
+      (func-exp (lids exp)
+                  (lambda (args)
+                    (let (
+                          (new-env (extend-env lids (list args) env))) 
+                      (eval-expression exp new-env))))
+      (call-exp (exp args)
+                (let (
+                      (func-val (eval-expression exp env))
+                      (eval-args (map (lambda (arg) (eval-expression arg env)) args)))
+                  (apply func-val eval-args)))
       (new-struct-exp (id lexps) '())
       (get-struct-exp (exp id) '())
       (set-struct-exp (exp1 id exp2) '())
