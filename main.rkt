@@ -196,9 +196,20 @@
                       (func-val (eval-expression exp env))
                       (eval-args (map (lambda (arg) (eval-expression arg env)) args)))
                   (apply func-val eval-args)))
-      (new-struct-exp (id lexps) '())
-      (get-struct-exp (exp id) '())
-      (set-struct-exp (exp1 id exp2) '())
+      (new-struct-exp (id lexps)
+                      (let* (
+                             (struct-def (apply-env env id))
+                             (struct-field (if struct-def struct-def (eopl:error "Estructura no definida"))))
+                        (if (= (length lexps) (length struct-field))
+                            (extend-env struct-field lexps env) (eopl:error "Numero incorrecto de argumentos"))))
+      (get-struct-exp (exp id)
+                      (let* (
+                             (exp-env (eval-expression exp env))
+                             (field-value (apply-env exp-env id)))
+                        (if field-value
+                            (eval-expression field-value env) (eopl:error "Campo no encontrado"))))
+      (set-struct-exp (exp1 id exp2)
+                      '())
       (match-exp (exp rexps lexps) '(
         
       ))
