@@ -32,8 +32,30 @@
 (define eval-program
   (lambda (pgm)
     (cases programa pgm
-      (a-programa (str body)
-                  (eval-expression body (init-env))))))
+      (a-programa (lstrc body)
+                  (cond
+                    [(null? lstrc) (eval-expression body (init-env))]
+                    [else (
+                      let ([structs (map (lambda (strc) (eval-struct strc)) lstrc)])
+                       (eval-expression body 
+                         (extend-env 
+                           (map (lambda (id) (car id)) structs)  (map (lambda (values) (cadr values)) structs)
+                            (init-env))
+                       )
+                    )]
+                  )  
+      ))))
+
+(define eval-struct 
+  (lambda (structs)
+    (cases struct-decl structs
+      (struct-exp (id lids) 
+          (list id lids)
+      )
+    )
+  )
+)
+
 
 ;eval-expression: <expression> <enviroment> -> numero
 (define eval-expression
@@ -57,11 +79,11 @@
       )
       (cadena-exp (id1 id2)
         (letrec
-            [(crear_string(lambda(lids)
+            [(crear_string (lambda(lids)
                             (cond
-                              [(null? lids)""]
-                              [else(string-append""(symbol->string(car lids))(crear_string(cdr lids)))])))]
-          (string-append(symbol->string id1)(crear_string id2))
+                              [(null? lids) "" ]
+                              [else( string-append " " (symbol->string(car lids))(crear_string(cdr lids)))])))]
+          (string-append (symbol->string id1)(crear_string id2))
           ))
       (decl-exp (dcl) (
         cases var-decl dcl
@@ -201,22 +223,6 @@
       )
   )
 )
-;     (expresion ("match" expresion "{" (arbno regular-exp "=>" expresion) "}") match-exp)
-;     (regular-exp (identificador "::" identificador) list-match-exp)
-;     (regular-exp ("numero" "(" identificador ")") num-match-exp)
-;     (regular-exp ("cadena" "(" identificador ")") cad-match-exp)
-;     (regular-exp ("boolean" "(" identificador ")") bool-match-exp)
-;     (regular-exp ("array" "(" (separated-list identificador ",") ")") array-match-exp)
-;     (regular-exp ("empty") empty-match-exp)
-;     (regular-exp ("default") default-match-exp)
-;     (regular-exp (identificador "::" identificador) list-match-exp)
-;     (regular-exp ("numero" "(" identificador ")") num-match-exp)
-;     (regular-exp ("cadena" "(" identificador ")") cad-match-exp)
-;     (regular-exp ("boolean" "(" identificador ")") bool-match-exp)
-;     (regular-exp ("array" "(" (separated-list identificador ",") ")") array-match-exp)
-;     (regular-exp ("empty") empty-match-exp)
-;     (regular-exp ("default") default-match-exp)
-
 
 (define apply-bool-primitive
   (lambda (prim args)
@@ -272,7 +278,7 @@
       (cases primitivaCadena prim
         (concat-primCad() (apply string-append args))
         (length-primCad() (string-length (car args)))
-        (index-primCad() (string-ref (car args)(cadr args))))))
+        (index-primCad() (string (string-ref (car args)(cadr args)))))))
 
 (define eval-rands
   (lambda (rands env)
