@@ -104,8 +104,30 @@
                   (eval-expression true-exp env)
                   (eval-expression false-exp env)))
       (for-exp (cond-exp from-exp until-exp by-exp do-exp) '())
-      (while-exp (cond-exp exp) '())
-      (switch-exp (cond-exp case-exp lexps default-exp) '())
+      (while-exp (cond-exp exp) (
+        let loop (
+          [cond (eval-expression cond-exp env)]
+          )
+          (if (not cond) #f
+              (begin
+                (eval-expression exp env)
+                (loop (eval-expression cond-exp env))
+              )
+          )
+      ))
+      (switch-exp (cond-exp case-exp lexps default-exp) (
+        let loop (
+          [match-case (eval-expression cond-exp env)]
+          [cases (map (lambda (exp) (eval-expression exp env)) lexps)]
+          [lexps lexps]
+          )
+           (cond
+            [(null? cases) (eval-expression default-exp env)]
+            [(eq? match-case (car cases)) (eval-expression (car lexps) env)]
+            [else (loop match-case (cdr cases) (cdr lexps))]
+            )
+          )
+      )
       (begin-exp (exp exps) 
                  (let loop (
                             (acc (eval-expression exp env))
