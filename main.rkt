@@ -55,7 +55,6 @@
   )
 )
 
-
 ;eval-expression: <expression> <enviroment> -> numero
 (define eval-expression
   (lambda (exp env)
@@ -94,8 +93,10 @@
 
           (let-exp (ids rands body) 
               (let ((args (eval-rands rands env)))
+                (if (contains-set? body)
+                    (eopl:error 'decl-exp "Cannot use 'set' in 'let' bindings")
                  (eval-expression body
-                                  (extend-env ids args env))))
+                                  (extend-env ids args env)))))
           )
       )
       (lista-exp(lexps) (
@@ -389,5 +390,15 @@
 (define eval-rand
   (lambda (rand env)
     (eval-expression rand env)))
+
+; Detects 'set' operation when used with 'let'
+(define contains-set?
+  (lambda (expr)
+    (cases expresion expr
+      (set-exp (id rhs-exp) #t)
+      (begin-exp (id rhs-exp) (contains-set? id))
+      (for-exp (cond-exp from-exp until-exp by-exp do-exp) (contains-set? do-exp))
+      (while-exp (cond-exp exp) (contains-set? exp))
+      (else #f))))
 
 (interpretador)
