@@ -3,7 +3,6 @@
 (require "environment.rkt")
 (require "utils.rkt")
 
-
 (sllgen:make-define-datatypes lexica gramatica)
 
 (define show-the-datatypes
@@ -242,19 +241,71 @@
                           ))
       )
       (match-exp (exp rexps lexps) 
-      (let 
-        ([match-value (eval-expression exp env)]
-         [lexps (map (lambda (exp) (eval-expression exp env)) lexps)]
-         [rexps rexps])
-         (
-          cond
-          [(null? rexps) #f]
-          [else #f])
+                  (let 
+                     loop([regular  (map (lambda (exp) (apply-regular-exp exp)) rexps)]
+                          [default-match (list #f )]
+                          [match-exps lexps]
+                          [match-value (eval-expression exp env)])
+                          (cond
+                            [(and (null? regular) (not (car default-match))) (eopl:error "No hay match")]
+                            [(null? regular) (eval-expression (cadr default-match) env)]
+                            [(is-number? match-value) (if (eq? (caar regular)'num-match) 
+                                                          (eval-expression (car match-exps) (extend-env (list (cadar regular)) (list match-value) env))
+                                                          (loop (cdr regular) (defaul-match-value default-match (caar regular) (car match-exps)) (cdr match-exps) match-value)
+                                                      )]
+                            [(string? match-value)  (if (eq? (caar regular)'cad-match) 
+                                                        (eval-expression (car match-exps) (extend-env (list (cadar regular)) (list match-value) env))
+                                                        (loop (cdr regular) (defaul-match-value default-match (caar regular) (car match-exps)) (cdr match-exps) match-value)
+                                                      )]
+                            [(boolean? match-value) (if (eq? (caar regular)'bool-match)
+                                                        (eval-expression (car match-exps) (extend-env (list (cadar regular)) (list match-value) env))
+                                                        (loop (cdr regular) (defaul-match-value default-match (caar regular) (car match-exps)) (cdr match-exps) match-value)
+                                                      )]
+                            [(null? match-value) (if(eq? (caar regular )'empty-match) 
+                                                    (eval-expression (car match-exps) env)
+                                                    (loop (cdr regular) (defaul-match-value default-match (caar regular) (car match-exps)) (cdr match-exps) match-value)
+                                                      )]
+                            [(list? match-value) (if (eq? (caar regular )'list-match)
+                                                     (eval-expression (car match-exps) (extend-env (cadar regular) (list (car match-value) (cdr match-value)) env))
+                                                     (loop (cdr regular) (defaul-match-value default-match (caar regular) (car match-exps)) (cdr match-exps) match-value)
+                                                      )]
+                            [(vector? match-value) (if (eq? (caar regular) 'array-math)
+                                                        (if (<= (length (cadar regular)) (vector-length match-value)) 
+                                                          (eval-expression (car match-exps) (extend-env (cadar regular) (vector->list (array-slice match-value 0 (- (length (cadar regular)) 1 ))) env))
+                                                          (eopl:error "Numero incorrecto de argumentos")
+                                                        )
+                                                        (loop (cdr regular) (defaul-match-value default-match (caar regular) (car match-exps)) (cdr match-exps) match-value)
+                                                        )]
+                            [else (loop (cdr regular) (defaul-match-value default-match (caar regular) (car match-exps)) (cdr match-exps) match-value)]
+                          ))
+                  )
       )
-        
-      )
-      )
+      
     )
+)
+
+(define defaul-match-value
+  (lambda (current-value regular exp )
+    (cond
+      [(eq? regular 'default-match) (list #t  exp)]
+      [(car current-value) current-value ]
+      [else (list #f )]
+    ) 
+  )
+)
+
+(define apply-regular-exp 
+  (lambda (regular)
+    (cases regular-exp regular
+      (list-match-exp (id1 id2) (list 'list-match (list id1 id2)))
+      (num-match-exp (id) (list 'num-match id))
+      (cad-match-exp (id) (list 'cad-match id))
+      (bool-match-exp (id) (list 'bool-match id))
+      (array-match-exp (ids) (list 'array-math ids))
+      (empty-match-exp () '(empty-match))
+      (default-match-exp () '(default-match))
+    ) 
+  )
 )
 
 (define apply-num-primitive
