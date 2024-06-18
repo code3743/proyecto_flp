@@ -24,3 +24,16 @@
   )
 
 (check-equal? (eval-program exp2) "pepe" "Test 2 failed")
+
+(define exp3 (scan&parse
+              "struct perro {nombre edad color}
+              let
+                t = new perro (\"lucas\", 10, \"verde\")
+                in 
+                    set-struct t.nombre = \"pepe\" "
+                                )
+  )
+
+(check-equal? (void? (eval-program exp3)) #t "Test 3 failed")
+
+
