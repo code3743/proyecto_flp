@@ -45,6 +45,7 @@
                   )  
       ))))
 
+; eval-struct: <struct> -> (list id lids)
 (define eval-struct 
   (lambda (structs)
     (cases struct-decl structs
@@ -59,12 +60,13 @@
 (define eval-expression
   (lambda (exp env)
     (cases expresion exp
+      
       (bool-exp (bool) 
         (cases bool-expresion bool
           (true-exp () #T)
           (false-exp () #F)
           )
-        )
+       )
       (var-exp (id) (apply-env env id))
       (num-exp (num) 
         (cases numero-exp num
@@ -74,7 +76,7 @@
           (hex-num (num) (convert-string num))
           (float-num (num) num)
         )
-      )
+       )
       (cadena-exp (id1 id2)
         (letrec
             [(crear_string (lambda(lids)
@@ -82,7 +84,8 @@
                               [(null? lids) "" ]
                               [else( string-append " " (symbol->string(car lids))(crear_string(cdr lids)))])))]
           (string-append (symbol->string id1)(crear_string id2))
-          ))
+         )
+       )
       (decl-exp (dcl) (
         cases var-decl dcl
           (lvar-exp (ids rands body)
@@ -98,7 +101,9 @@
                  (eval-expression body
                                   (extend-env ids args env)))))
           )
-      )
+       )
+
+      ; Listas y arrays
       (lista-exp(lexps) (
         map (lambda (exp) (eval-expression exp env)) lexps
       ))
@@ -109,6 +114,8 @@
                  (let (
                        (evaluated (map (lambda (exp) (eval-expression exp env)) lexp)))
                        (list->vector evaluated)))
+
+      ; Expresion primitivas
       (prim-num-exp (exp1 prim exp2) (
         apply-num-primitive prim (eval-expression exp1 env) (eval-expression exp2 env))
       )
@@ -132,10 +139,13 @@
                                             (map (lambda (lexps)
                                                    (eval-expression lexps env))
                                                  lexps)))
+      ; Condicionales
       (if-exp (test-exp true-exp false-exp) 
               (if (eval-expression test-exp env)
                   (eval-expression true-exp env)
                   (eval-expression false-exp env)))
+
+      ; Iteradores
       (for-exp (cond-exp from-exp until-exp by-exp do-exp)
                (let loop (
                           (env (extend-env (list cond-exp) (list (eval-expression from-exp env)) env))
@@ -148,7 +158,7 @@
                               (new-acc (+ acc do-val))
                               (new-env (extend-env (list cond-exp) (list (+ current-val by-val)) env)))
                          (loop new-env until-val by-val new-acc))
-                       acc))))
+                       acc))))      
       (while-exp (cond-exp exp) (
         let loop (
           [cond (eval-expression cond-exp env)]
@@ -160,6 +170,8 @@
               )
           )
       ))
+      
+      ;Switch
       (switch-exp (cond-exp case-exp lexps default-exp) (
         let loop (
           [match-case (eval-expression cond-exp env)]
@@ -173,6 +185,8 @@
             )
           )
       )
+
+      ; Secuenciación y asignación
       (begin-exp (exp exps) 
                  (let loop (
                             (acc (eval-expression exp env))
@@ -186,6 +200,8 @@
                   (apply-env-ref env id)
                   (eval-expression rhs-exp env))
                  1))
+
+      ; Funciones
       (func-exp (lids exp)
                   (lambda (args env)
                     (let (
@@ -197,6 +213,8 @@
                       (func-val (eval-expression exp env))
                       (eval-args (map (lambda (arg) (eval-expression arg env)) args)))
                   (apply func-val (list eval-args env))))
+
+      ; Instanciación y uso de estructuras
       (new-struct-exp (id lexps)
                       (let* (
                              (struct-def (apply-env env id))
@@ -241,6 +259,8 @@
                               )
                           ))
       )
+      
+      ; Reconocimiento de patrones
       (match-exp (exp rexps lexps) 
                   (let 
                      loop([regular  (map (lambda (exp) (apply-regular-exp exp)) rexps)]
@@ -309,6 +329,7 @@
   )
 )
 
+; Data primitives
 (define apply-num-primitive
   (lambda (prim num1 num2)
     (cases primitiva prim
@@ -383,6 +404,7 @@
         (length-primCad() (string-length (car args)))
         (index-primCad() (string (string-ref (car args)(cadr args)))))))
 
+;Evaluate list of operands
 (define eval-rands
   (lambda (rands env)
     (map (lambda (x) (eval-rand x env)) rands)))
