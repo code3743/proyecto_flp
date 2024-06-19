@@ -219,10 +219,11 @@
       (new-struct-exp (id lexps)
                       (let* (
                              (struct-def (apply-env env id))
-                             (struct-field (if struct-def struct-def (eopl:error "Estructura no definida"))))
+                             (struct-field (if struct-def struct-def (eopl:error "undefined structure")))
+                             )
                         (if (= (length lexps) (length struct-field))
                             (list->vector (list id (map (lambda (exp) (eval-expression exp env)) lexps)))
-                            (eopl:error "Numero incorrecto de argumentos"))))
+                            (eopl:error "number of incorrect attributes"))))
       (get-struct-exp (exp id)
                       (let* (
                              (struct-decl (eval-expression exp env))
@@ -232,7 +233,7 @@
                             [field-struct struct-id-values]
                             [values (vector-ref struct-decl 1)])
                         (cond
-                          [(null? field-struct) (eopl:error "Campo no encontrado") ]
+                          [(null? field-struct) (eopl:error "attribute not found")]
                           [(eq? (car field-struct) id) (car values)]
                           [else (loop (cdr field-struct) (cdr values))]
                         ))
@@ -255,7 +256,7 @@
                                   [acc '()]
                                 )
                                 (cond
-                                  [(null? struct-values) (eopl:error "Campo no encontrado")]
+                                  [(null? struct-values) (eopl:error "attribute not found")]
                                   [(eq? id (car struct-values)) (append acc (list (eval-expression exp2 env)))]
                                   [else (loop (cdr struct-values) (cdr values) (car values))]
                                 )
@@ -272,7 +273,7 @@
                           [match-exps lexps]
                           [match-value (eval-expression exp env)])
                           (cond
-                            [(and (null? regular) (not (car default-match))) (eopl:error "No hay match")]
+                            [(and (null? regular) (not (car default-match))) (eopl:error "there is no match")]
                             [(null? regular) (eval-expression (cadr default-match) env)]
                             [(is-number? match-value) (if (eq? (caar regular)'num-match) 
                                                           (eval-expression (car match-exps) (extend-env (list (cadar regular)) (list match-value) env))
@@ -297,7 +298,7 @@
                             [(vector? match-value) (if (eq? (caar regular) 'array-math)
                                                         (if (<= (length (cadar regular)) (vector-length match-value)) 
                                                           (eval-expression (car match-exps) (extend-env (cadar regular) (vector->list (array-slice match-value 0 (- (length (cadar regular)) 1 ))) env))
-                                                          (eopl:error "Numero incorrecto de argumentos")
+                                                          (eopl:error "index overflow")
                                                         )
                                                         (loop (cdr regular) (defaul-match-value default-match (caar regular) (car match-exps)) (cdr match-exps) match-value)
                                                         )]
