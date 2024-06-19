@@ -34,6 +34,6 @@
                                 )
   )
 
-(check-equal? (void? (eval-program exp3)) #t "Test 3 failed")
+(check-equal? (eval-program exp3) 'void "Test 3 failed")
 
 
