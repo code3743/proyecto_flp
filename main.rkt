@@ -427,6 +427,6 @@
       (while-exp (cond-exp exp) (contains-set? exp))
       (else #f))))
 
-(interpretador)
+;;(interpretador)
 
 (provide (all-defined-out))
