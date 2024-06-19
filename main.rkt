@@ -67,6 +67,7 @@
           (false-exp () #F)
           )
        )
+      (void-exp () 'void)
       (var-exp (id) (apply-env env id))
       (num-exp (num) 
         (cases numero-exp num
@@ -147,19 +148,19 @@
 
       ; Iteradores
       (for-exp (cond-exp from-exp until-exp by-exp do-exp)
-               (let loop (
-                          (env (extend-env (list cond-exp) (list (eval-expression from-exp env)) env))
-                          (until-val (eval-expression until-exp env))
-                          (by-val (eval-expression by-exp env))
-                          (acc 0))
-                 (let ((current-val (apply-env env cond-exp)))
-                   (if (< current-val until-val) 
-                       (let* ((do-val (eval-expression do-exp env))
-                              (new-acc (+ acc do-val))
-                              (new-env (extend-env (list cond-exp) (list (+ current-val by-val)) env)))
-                         (loop new-env until-val by-val new-acc))
-                       acc))))      
-      (while-exp (cond-exp exp) (
+                (let loop (
+                           (env (extend-env (list cond-exp) (list (eval-expression from-exp env)) env))
+                           (until-val (eval-expression until-exp env))
+                           (by-val (eval-expression by-exp env))
+                                                      (acc 0))
+                  (let ((current-val (apply-env env cond-exp)))
+                    (if (< current-val until-val) 
+                        (let* ((do-val (eval-expression do-exp env))
+                               (new-acc (+ acc do-val))
+                               (new-env (extend-env (list cond-exp) (list (+ current-val by-val)) env)))
+                          (loop new-env until-val by-val new-acc))
+                       acc))))
+                    (while-exp (cond-exp exp) (
         let loop (
           [cond (eval-expression cond-exp env)]
           )
@@ -195,11 +196,11 @@
                         (loop (eval-expression (car exps) env)
                               (cdr exps)))))
       (set-exp (id rhs-exp)
-               (begin
+              (eval-expression (begin
                  (setref!
                   (apply-env-ref env id)
                   (eval-expression rhs-exp env))
-                 1))
+                 (void-exp)) env))
 
       ; Funciones
       (func-exp (lids exp)
@@ -238,6 +239,8 @@
                         
                       )) 
       (set-struct-exp (exp1 id exp2)
+                (eval-expression
+                  (begin
                     (let* 
                           (
                            [struct-def (eval-expression exp1 env)]
@@ -258,6 +261,7 @@
                                 )
                               )
                           ))
+                        (void-exp)) env)
       )
       
       ; Reconocimiento de patrones
@@ -423,6 +427,6 @@
       (while-exp (cond-exp exp) (contains-set? exp))
       (else #f))))
 
-;;(interpretador)
+(interpretador)
 
 (provide (all-defined-out))
