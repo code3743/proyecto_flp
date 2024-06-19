@@ -163,11 +163,11 @@
        (while-exp (cond-exp exp) (
                                   let loop (
                                             [cond (eval-expression cond-exp env)]
+                                            [last (eval-expression (void-exp) env)]
                                             )
-                                   (if (not cond) #f
-                                       (begin
-                                         (eval-expression exp env)
-                                         (loop (eval-expression cond-exp env))
+                                   (if (not cond) last
+                                       (let ([value (eval-expression exp env)])
+                                            (loop (eval-expression cond-exp env) value)
                                          )
                                        )
                                    ))
