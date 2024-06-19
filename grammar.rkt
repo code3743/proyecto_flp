@@ -39,6 +39,7 @@
     (expresion (numero-exp) num-exp)    
     (expresion ("\"" identificador (arbno identificador) "\"") cadena-exp)
     (expresion (var-decl) decl-exp)
+    (expresion ("void") void-exp)
 
     ;;Listas y arrays
     (expresion ("list" "(" (separated-list expresion ",") ")") lista-exp)
