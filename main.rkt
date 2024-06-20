@@ -426,6 +426,9 @@
       (begin-exp (id rhs-exp) (contains-set? id))
       (for-exp (cond-exp from-exp until-exp by-exp do-exp) (contains-set? do-exp))
       (while-exp (cond-exp exp) (contains-set? exp))
+      (if-exp (test-exp true-exp false-exp) (or (contains-set? true-exp) (contains-set? false-exp)))
+      (switch-exp (cond-exp case-exp lexps default-exp) (or (contains-set? case-exp) (contains-set? default-exp)))
+      (match-exp (exp rexps lexps) (or (contains-set? exp) (contains-set? lexps)))
       (else #f))))
 
 ;;(interpretador)
