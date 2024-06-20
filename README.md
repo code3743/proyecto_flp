@@ -4,6 +4,7 @@
 - Bernal, Pedro - 2259548-3743
 - López, Jota - 2259394-3743
 - Rivas, Esmeralda - 2259580-3743
+- Ruiz, Carlos - 2259629-3743
 
 ### Descripción:
 El objetivo de este proyecto es desarrollar un intérprete para un lenguaje de programación [específico](grammar.rkt), aprovechando las capacidades de Racket y la librería SLLGEN. Racket, junto con SLLGEN, facilita la generación de analizadores léxicos y sintácticos, proporcionando un entorno ideal para este desarrollo. El lenguaje de programación implementado incluye un subconjunto de características, tales como:
